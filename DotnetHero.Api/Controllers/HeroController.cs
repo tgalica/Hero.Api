@@ -24,9 +24,22 @@ namespace HeroApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetHeroes([FromQuery] string name)
         {
-            return Ok(await _heroService.Heroes());
+            if (string.IsNullOrEmpty(name))
+            {
+                return Ok(await _heroService.GetHeroes());
+            }
+            else
+            {
+                return Ok(await _heroService.SearchHeroes(name));
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetHero([FromRoute] int id)
+        {
+            return Ok(await _heroService.GetHero(id));
         }
 
         [HttpPost]

@@ -23,7 +23,7 @@ namespace HeroApi.Implementation
             
         }
         
-        public async Task<IEnumerable<HeroDocument>> Heroes()
+        public async Task<IEnumerable<HeroDocument>> GetHeroes()
         {
             var filter = Builders<HeroDocument>.Filter.Empty;
             var cursor = await collection.FindAsync(filter);
@@ -50,6 +50,19 @@ namespace HeroApi.Implementation
 
             var replaceOneResult = await collection.FindOneAndUpdateAsync<HeroDocument>(filter,updates);
             return hero;
+        }
+
+        public async Task<IEnumerable<HeroDocument>> SearchHeroes(string term)
+        {
+            // Text search would be faster than Regex but requires a Text Index on the collection.
+            var filter = Builders<HeroDocument>.Filter.Regex(dbHero => dbHero.name, $"/{term}/i");
+            var cursor = await collection.FindAsync(filter);
+            return cursor.ToEnumerable();
+        }
+        public async Task<HeroDocument> GetHero(int id)
+        {
+            var result = await collection.FindAsync<HeroDocument>(db => db.id == id);
+            return result.FirstOrDefault();
         }
     }
 }
